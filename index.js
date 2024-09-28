@@ -6,7 +6,7 @@ app.use(cors());
 const port = process.env.PORT || 5000;
 //
 
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const uri =
   "mongodb+srv://simple-crud-server:RXhWyhAvzDa2WxCv@cluster0.ax6qyiu.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
@@ -24,8 +24,22 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
     //
-    const database = client.db("usersDB");
-    const usersCollection = database.collection("users");
+    // const database = ;
+    const usersCollection = client.db("usersDB").collection("users");
+
+    app.get("/users", async (req, res) => {
+      const cursor = usersCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+    // delete route
+    app.delete("/users/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await usersCollection.deleteOne(query);
+      res.send(result);
+    });
+    // post user
     app.post("/users", async (req, res) => {
       const user = req.body;
       console.log(user);
